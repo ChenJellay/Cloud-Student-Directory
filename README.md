@@ -24,8 +24,10 @@ Student question
 ## Prerequisites
 
 - Docker Desktop (for Dev Containers), **or**
-- Python 3.12+ and [Ollama](https://ollama.com/) installed locally
+- **Python 3.9+** (3.10+ preferred) and [Ollama](https://ollama.com/) installed locally
 - Git
+
+> FastAPI / Pydantic v2 need Python ≥ 3.8. AWS Cloud9 often defaults to **Python 3.7** — that will fail `pip install`. See [Learner Lab / Cloud9](#learner-lab--cloud9) below.
 
 ## Repo layout
 
@@ -63,8 +65,10 @@ curl -s http://127.0.0.1:8000/ask \
 ## Quick start (local, without Devcontainer)
 
 ```bash
+python3 --version   # must be 3.9+
 python3 -m venv .venv
 source .venv/bin/activate
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 
 # Optional: real answers via Ollama
@@ -73,6 +77,42 @@ ollama pull tinyllama
 
 # Stub-only (no Ollama required) — proves end-to-end pipeline
 LLM_MODE=stub uvicorn gateway.main:app --app-dir src --host 0.0.0.0 --port 8000 --reload
+```
+
+## Learner Lab / Cloud9
+
+Cloud9’s default `python3` is often **3.7**. Recreate the venv with a newer interpreter:
+
+```bash
+# 1) See what you have
+python3 --version
+ls /usr/bin/python3*
+
+# 2) Install Python 3.9 on Amazon Linux 2 Cloud9 (typical Learner Lab image)
+sudo yum install -y python39 python39-devel
+
+# (Amazon Linux 2023 instead:)
+# sudo dnf install -y python3.9 python3.9-devel
+
+# 3) Blow away the old 3.7 venv and recreate
+deactivate 2>/dev/null || true
+rm -rf .venv
+python3.9 -m venv .venv
+source .venv/bin/activate
+python --version          # confirm 3.9.x
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+
+# 4) Run (stub mode — no Ollama needed on Cloud9)
+LLM_MODE=stub uvicorn gateway.main:app --app-dir src --host 0.0.0.0 --port 8080
+```
+
+If `yum`/`dnf` has no `python39`, try `python3.11` / `python311`, or:
+
+```bash
+sudo amazon-linux-extras enable python3.8
+sudo yum install -y python3.8 python3.8-devel
+python3.8 -m venv .venv
 ```
 
 ## API
