@@ -62,7 +62,9 @@ Use this checklist for agent-generated code before considering it submission-rea
 
 | Date | Reviewer | What was reviewed | Outcome |
 |------|----------|-------------------|---------|
-| 2026-07-19 | _(fill in your name)_ | Initial agent scaffold (gateway, devcontainer, docs) | Pending teammate sign-off after local/Learner Lab run |
+| 2026-07-19 | Jerry Chen | Initial agent scaffold (gateway, devcontainer, docs) | Pending teammate sign-off after local/Learner Lab run |
+| 2026-07-19 | Jerry Chen | Code deployability on AWS (ran on Cloud9) | Bare-minimum repo working as intended, code deploys on Cloud9 perfectly|
+| 2026-07-19 | Jerry Chen | Architectural Mechanics (whether the backend & UX work as intended) | Code runs on Cloud9 stub mode works perfectly & LLM mode requires large disk space to run with Ollama |
 | | | | |
 
 ---
