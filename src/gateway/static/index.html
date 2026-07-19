@@ -212,7 +212,7 @@
   <div class="shell">
     <header>
       <h1>CMU Student Support Q&A</h1>
-      <p>Ask about published campus logistics. Visa and crisis topics are hard-routed before any model call.</p>
+      <p>Ask about published campus logistics. Visa and crisis topics are hard-routed before any model call. Stub needs no model disk; LLM needs local Ollama.</p>
     </header>
 
     <div class="toolbar">
@@ -221,7 +221,7 @@
         <button type="button" id="mode-stub" class="active" data-mode="stub">Stub</button>
         <button type="button" id="mode-llm" data-mode="llm">LLM</button>
       </div>
-      <span class="status" id="status">mode: stub</span>
+      <span class="status" id="status">mode: stub · ollama: …</span>
     </div>
 
     <div class="chat" id="chat" aria-live="polite">
@@ -249,13 +249,38 @@
     const modeButtons = [...document.querySelectorAll(".toggle button")];
 
     let mode = "stub";
+    let ollamaLabel = "checking";
+
+    function renderStatus(extra) {
+      const suffix = extra ? ` · ${extra}` : "";
+      statusEl.textContent = `mode: ${mode} · ollama: ${ollamaLabel}${suffix}`;
+    }
 
     function setModeUI(next) {
       mode = next;
       modeButtons.forEach((btn) => {
         btn.classList.toggle("active", btn.dataset.mode === mode);
       });
-      statusEl.textContent = `mode: ${mode}`;
+      renderStatus();
+    }
+
+    async function refreshHealth() {
+      try {
+        const res = await fetch("/health");
+        const data = await res.json();
+        if (data.ollama_model_ready) ollamaLabel = "ready";
+        else if (data.ollama_reachable) ollamaLabel = "up (pull model)";
+        else ollamaLabel = "offline";
+        if (data.llm_mode === "llm" || data.llm_mode === "stub") {
+          mode = data.llm_mode;
+          modeButtons.forEach((btn) => {
+            btn.classList.toggle("active", btn.dataset.mode === mode);
+          });
+        }
+      } catch (_) {
+        ollamaLabel = "unknown";
+      }
+      renderStatus();
     }
 
     async function loadMode() {
@@ -266,6 +291,7 @@
       } catch (_) {
         setModeUI("stub");
       }
+      await refreshHealth();
     }
 
     modeButtons.forEach((btn) => {
@@ -278,6 +304,7 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ mode: next }),
           });
+          await refreshHealth();
         } catch (_) {
           /* local UI state still updates */
         }
@@ -324,7 +351,7 @@
       appendMessage("user", question);
       questionEl.value = "";
       sendBtn.disabled = true;
-      statusEl.textContent = `mode: ${mode} · thinking…`;
+      renderStatus("thinking…");
 
       try {
         const res = await fetch("/ask", {
@@ -336,10 +363,11 @@
         if (!res.ok) throw new Error(data.detail || "Request failed");
         appendMessage("bot", data.answer, data);
         if (data.disclaimer) disclaimerEl.textContent = data.disclaimer;
-        statusEl.textContent = `mode: ${mode} · ok`;
+        await refreshHealth();
+        renderStatus(data.backend === "error" ? "backend error" : "ok");
       } catch (err) {
         appendMessage("bot", `Error: ${err.message || err}`);
-        statusEl.textContent = `mode: ${mode} · error`;
+        renderStatus("error");
       } finally {
         sendBtn.disabled = false;
         questionEl.focus();

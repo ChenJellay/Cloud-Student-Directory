@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field
 from .config import settings
 from .interceptors import apply_interceptors
 from .knowledge import retrieve
-from .llm_client import LLMClient
+from .llm_client import OLLAMA_SETUP_HINT, LLMClient
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 
@@ -25,7 +25,7 @@ app = FastAPI(
     description=(
         "Minimal V1 student-support Q&A gateway. "
         "Safety interceptors run before any model call. "
-        "Default model backend is free/local Ollama."
+        "Stub mode works with zero model disk; LLM mode uses local Ollama when available."
     ),
     version="0.1.0",
 )
@@ -36,6 +36,7 @@ _runtime_mode = settings.llm_mode.lower().strip()
 if _runtime_mode in {"llm", "ollama"}:
     _runtime_mode = "llm"
 elif _runtime_mode != "stub":
+    # Prefer stub for constrained lab VMs; UI can still switch to LLM.
     _runtime_mode = "stub"
 
 
@@ -85,8 +86,17 @@ async def index() -> FileResponse:
 
 
 @app.get("/health")
-async def health() -> dict[str, str]:
-    return {"status": "ok", "llm_mode": _runtime_mode}
+async def health() -> dict[str, object]:
+    status = await llm.probe_ollama()
+    return {
+        "status": "ok",
+        "llm_mode": _runtime_mode,
+        "ollama_host": settings.ollama_host,
+        "ollama_model": settings.ollama_model,
+        "ollama_reachable": status.reachable,
+        "ollama_model_ready": status.model_ready,
+        "ollama_detail": status.detail,
+    }
 
 
 @app.get("/mode", response_model=ModeResponse)
@@ -129,9 +139,9 @@ async def ask(payload: AskRequest) -> AskResponse:
         if ui_mode == "llm":
             return AskResponse(
                 answer=(
-                    "LLM mode is on, but Ollama did not respond. "
-                    "Start Ollama (`ollama serve` + `ollama pull tinyllama`) "
-                    f"or switch back to Stub. Details: {exc}"
+                    "LLM mode is selected, but the model backend is not ready. "
+                    f"{OLLAMA_SETUP_HINT} "
+                    f"Details: {exc}"
                 ),
                 intercepted=False,
                 interceptor_category=None,

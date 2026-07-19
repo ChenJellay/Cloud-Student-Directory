@@ -35,6 +35,13 @@ def test_ui_and_stub_ask():
     assert home.status_code == 200
     assert "Student Support" in home.text
 
+    health = client.get("/health")
+    assert health.status_code == 200
+    payload = health.json()
+    assert payload["status"] == "ok"
+    assert "ollama_reachable" in payload
+    assert "ollama_model_ready" in payload
+
     mode = client.post("/mode", json={"mode": "stub"})
     assert mode.status_code == 200
     assert mode.json()["mode"] == "stub"
@@ -48,3 +55,16 @@ def test_ui_and_stub_ask():
     assert body["backend"] == "stub"
     assert body["mode"] == "stub"
     assert "STUB" in body["answer"]
+
+
+def test_llm_mode_without_ollama_returns_friendly_error():
+    client = TestClient(app)
+    ask = client.post(
+        "/ask",
+        json={"question": "Where is the library?", "mode": "llm"},
+    )
+    assert ask.status_code == 200
+    body = ask.json()
+    assert body["mode"] == "llm"
+    assert body["backend"] == "error"
+    assert "Ollama" in body["answer"] or "ollama" in body["answer"].lower()

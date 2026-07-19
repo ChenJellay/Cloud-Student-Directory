@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
+from typing import Any
 
 import httpx
 
@@ -19,6 +20,12 @@ relevant office. Do not provide personalized advising, grade estimates, or
 immigration advice.
 """
 
+OLLAMA_SETUP_HINT = (
+    "LLM mode needs a local Ollama daemon and model. "
+    "Install Ollama, run `ollama serve`, then `ollama pull tinyllama` "
+    "(~2GB+ free disk). On small Cloud9 disks, stay on Stub mode."
+)
+
 
 @dataclass
 class ModelReply:
@@ -27,9 +34,49 @@ class ModelReply:
     model: str
 
 
+@dataclass
+class OllamaStatus:
+    reachable: bool
+    model_ready: bool
+    model: str
+    models: list[str]
+    detail: str = ""
+
+
 class LLMClient:
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
+
+    async def probe_ollama(self) -> OllamaStatus:
+        """Report whether Ollama is up and the configured model is pulled."""
+        host = self.settings.ollama_host.rstrip("/")
+        wanted = self.settings.ollama_model
+        try:
+            async with httpx.AsyncClient(timeout=3.0) as client:
+                response = await client.get(f"{host}/api/tags")
+                response.raise_for_status()
+                payload: dict[str, Any] = response.json()
+        except Exception as exc:  # noqa: BLE001
+            return OllamaStatus(
+                reachable=False,
+                model_ready=False,
+                model=wanted,
+                models=[],
+                detail=str(exc),
+            )
+
+        names = [m.get("name", "") for m in payload.get("models", []) if isinstance(m, dict)]
+        ready = any(
+            name == wanted or name.startswith(f"{wanted}:") or name.startswith(wanted)
+            for name in names
+        )
+        return OllamaStatus(
+            reachable=True,
+            model_ready=ready,
+            model=wanted,
+            models=names,
+            detail="" if ready else f"model '{wanted}' not pulled yet",
+        )
 
     async def answer(
         self, question: str, context: str, mode: str | None = None
@@ -53,7 +100,7 @@ class LLMClient:
             answer=(
                 "[STUB] Pipeline OK. Received your question: "
                 f"“{question.strip()}”. "
-                "Switch the UI to LLM mode (and run Ollama) "
+                "Switch the UI to LLM mode (with Ollama running) "
                 "to generate a real answer from the local knowledge snippets."
             ),
             backend="stub",
@@ -63,6 +110,20 @@ class LLMClient:
     async def _ollama(self, question: str, context: str) -> ModelReply:
         host = self.settings.ollama_host.rstrip("/")
         model = self.settings.ollama_model
+        status = await self.probe_ollama()
+        if not status.reachable:
+            raise RuntimeError(
+                f"Ollama is not reachable at {host}. {OLLAMA_SETUP_HINT} "
+                f"Details: {status.detail}"
+            )
+        if not status.model_ready:
+            raise RuntimeError(
+                f"Ollama is up, but model '{model}' is missing. "
+                f"Run: ollama pull {model}. "
+                "That needs roughly 2GB+ free disk. "
+                f"Available models: {status.models or '[]'}"
+            )
+
         prompt = (
             f"{SYSTEM_PROMPT}\n\n"
             f"Official context snippets:\n{context}\n\n"
@@ -76,8 +137,6 @@ class LLMClient:
             "options": {"temperature": 0.2},
         }
         async with httpx.AsyncClient(timeout=self.settings.request_timeout_seconds) as client:
-            tags = await client.get(f"{host}/api/tags")
-            tags.raise_for_status()
             response = await client.post(f"{host}/api/generate", json=payload)
             response.raise_for_status()
             data = response.json()

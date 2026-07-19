@@ -18,7 +18,9 @@ Open the browser UI at `/` — toggle **Stub** / **LLM**, type a question, and r
 
 ## Launch from scratch (Learner Lab / Cloud9, no sudo)
 
-Use **port 8000** (Cloud9 often already has something on 8080). Run every step in the **same** Cloud9 environment.
+Use **port 8080** for Cloud9 Preview (ports 8080–8082). Use **8000** locally if you prefer. Run every step in the **same** Cloud9 environment.
+
+**Cloud9 note:** Stub mode is the supported demo path on small disks. LLM/Ollama needs ~2GB+ free — see [`docs/LLM_SETUP.md`](docs/LLM_SETUP.md).
 
 ```bash
 # 0) Go home and clone (skip clone if the repo already exists)
@@ -40,42 +42,43 @@ source .venv/bin/activate
 python --version
 uv pip install -r requirements.txt
 
-# 3) Start the gateway (stub works with no Ollama)
-LLM_MODE=stub uvicorn gateway.main:app --app-dir src --host 0.0.0.0 --port 8000
+# 3) Start the gateway (stub works with no Ollama / no extra disk)
+LLM_MODE=stub uvicorn gateway.main:app --app-dir src --host 0.0.0.0 --port 8080
 ```
 
 Then, **in a second terminal in the same IDE**:
 
 ```bash
-curl -s http://127.0.0.1:8000/health
-# expect: {"status":"ok","llm_mode":"stub"}
+curl -s http://127.0.0.1:8080/health
+# expect status=ok, llm_mode=stub; ollama_reachable may be false on Cloud9 — that is fine
 ```
 
 **Open the UI**
 
-- Cloud9: **Preview → Preview Running Application** (or open `http://127.0.0.1:8000/` from the IDE browser tools)
-- Or click the forwarded URL for port 8000
+- Cloud9: **Preview → Preview Running Application** (app must be on **8080**)
+- Locally: http://127.0.0.1:8080/
 
-In the UI: toggle **Stub** / **LLM**, type a question, press **Ask**.
+In the UI: leave **Stub** selected on small disks. **LLM** works when Ollama is installed and has disk (status shows `ollama: ready`).
 
 Optional API check:
 
 ```bash
-curl -s http://127.0.0.1:8000/ask \
+curl -s http://127.0.0.1:8080/ask \
   -H 'Content-Type: application/json' \
   -d '{"question":"Where can I find the academic calendar?","mode":"stub"}'
 ```
 
 ### Optional — real LLM answers (Ollama)
 
-In another terminal (same machine), if Ollama is installed:
+Requires ~2GB+ free disk. Full steps: [`docs/LLM_SETUP.md`](docs/LLM_SETUP.md).
 
 ```bash
-ollama serve
-ollama pull tinyllama
+# after ollama serve + ollama pull tinyllama
+curl -s http://127.0.0.1:8080/health   # ollama_model_ready should be true
+curl -s http://127.0.0.1:8080/ask \
+  -H 'Content-Type: application/json' \
+  -d '{"question":"Where can I find the academic calendar?","mode":"llm"}'
 ```
-
-Then switch the UI toggle to **LLM** (or send `"mode":"llm"`).
 
 ---
 

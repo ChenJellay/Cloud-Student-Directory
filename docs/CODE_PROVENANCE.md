@@ -38,6 +38,7 @@ Update this file whenever substantial new code or docs are added.
 | `src/gateway/llm_client.py` | Agent-generated | Cursor agent | Reviewed stub fallback + Ollama `/api/generate` usage |
 | `src/gateway/main.py` | Agent-generated | Cursor agent | Reviewed `/health`, `/ask`, `/mode`, UI static mount |
 | `src/gateway/static/index.html` | Agent-generated | Cursor agent | Reviewed Stub/LLM toggle + chat transcript UX |
+| `docs/LLM_SETUP.md` | Agent-generated | Cursor agent | Optional Ollama path for machines with enough disk |
 | `src/__init__.py` | Agent-generated | Cursor agent | N/A |
 | `tests/test_gateway.py` | Agent-generated | Cursor agent | Run `pytest`; extend if interceptors change |
 | `docs/architecture-diagram.md` | Agent-generated | Cursor agent | Check labels/one-liners against running system |
