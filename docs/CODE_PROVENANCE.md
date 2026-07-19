@@ -14,8 +14,9 @@ Update this file whenever substantial new code or docs are added.
 | Origin | Approximate share of this initial scaffold | Notes |
 |--------|--------------------------------------------|-------|
 | Agent-generated | ~95% of first commit scaffold | Application code, Devcontainer, docs drafts, tests |
-| Human-written | Scoping Document + ADR 001 (`.docx`) | Authored earlier; used as architectural source of truth |
+| Human-validated | Scoping Document + ADR 001 (`.docx`) | Authored earlier; used as architectural source of truth |
 | Human-validated | All agent output below | Reviewed for scope fit, safety wording, and run instructions |
+| Human-written | Review logs & validations | Running tests, deploying the systems, testing the system on AWS, working with Git, etc. |
 
 ---
 
@@ -41,8 +42,13 @@ Update this file whenever substantial new code or docs are added.
 | `docs/LLM_SETUP.md` | Agent-generated | Cursor agent | Optional Ollama path for machines with enough disk |
 | `src/__init__.py` | Agent-generated | Cursor agent | N/A |
 | `tests/test_gateway.py` | Agent-generated | Cursor agent | Run `pytest`; extend if interceptors change |
-| `docs/architecture-diagram.md` | Agent-generated | Cursor agent | Check labels/one-liners against running system |
-| `docs/architecture-narrative.md` | Agent-generated | Cursor agent | Human edit for voice / page length if required |
+| `docs/architecture-diagram.md` | Agent-generated (legacy stub) | Cursor agent | Redirects to current/future split |
+| `docs/architecture-diagram-current.md` | Agent-generated | Cursor agent | Current-state only diagram |
+| `docs/architecture-diagram-future.md` | Agent-generated | Cursor agent | Future/ADR-target diagram |
+| `docs/architecture-narrative.md` | Agent-generated (legacy stub) | Cursor agent | Redirects to current/future split |
+| `docs/architecture-narrative-current.md` | Agent-generated | Cursor agent | Current-state only narrative |
+| `docs/architecture-narrative-future.md` | Agent-generated | Cursor agent | Future/ADR-target narrative |
+| `docs/README.md` | Agent-generated | Cursor agent | Index of architecture docs |
 | `docs/CODE_PROVENANCE.md` | Agent-generated (this file) | Cursor agent | Maintain on every subsequent change |
 | `knowledge/README.md` | Agent-generated | Cursor agent | Reviewed |
 
@@ -65,6 +71,7 @@ Use this checklist for agent-generated code before considering it submission-rea
 | 2026-07-19 | Jerry Chen | Initial agent scaffold (gateway, devcontainer, docs) | Pending teammate sign-off after local/Learner Lab run |
 | 2026-07-19 | Jerry Chen | Code deployability on AWS (ran on Cloud9) | Bare-minimum repo working as intended, code deploys on Cloud9 perfectly|
 | 2026-07-19 | Jerry Chen | Architectural Mechanics (whether the backend & UX work as intended) | Code runs on Cloud9 stub mode works perfectly & LLM mode requires large disk space to run with Ollama |
+| 2026-07-19 | Jerry Chen | Documentation Review | Looked through docs and all files produced by agent & made corrections manually, and provided additional instructions as needed |
 | | | | |
 
 ---

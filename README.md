@@ -158,8 +158,11 @@ pytest
 | Deliverable | Location |
 |-------------|----------|
 | Working GitHub + Devcontainer | this repo |
-| Architecture diagram | [`docs/architecture-diagram.md`](docs/architecture-diagram.md) |
-| Architecture narrative | [`docs/architecture-narrative.md`](docs/architecture-narrative.md) |
+| Architecture diagram (current) | [`docs/architecture-diagram-current.md`](docs/architecture-diagram-current.md) |
+| Architecture diagram (future) | [`docs/architecture-diagram-future.md`](docs/architecture-diagram-future.md) |
+| Architecture narrative (current) | [`docs/architecture-narrative-current.md`](docs/architecture-narrative-current.md) |
+| Architecture narrative (future) | [`docs/architecture-narrative-future.md`](docs/architecture-narrative-future.md) |
+| Docs index | [`docs/README.md`](docs/README.md) |
 | Code provenance log | [`docs/CODE_PROVENANCE.md`](docs/CODE_PROVENANCE.md) |
 
 Reference docs: [`docs/reference/`](docs/reference/).
