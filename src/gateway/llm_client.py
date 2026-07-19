@@ -31,11 +31,15 @@ class LLMClient:
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
 
-    async def answer(self, question: str, context: str) -> ModelReply:
-        mode = self.settings.llm_mode.lower().strip()
-        if mode == "stub":
+    async def answer(
+        self, question: str, context: str, mode: str | None = None
+    ) -> ModelReply:
+        resolved = (mode or self.settings.llm_mode).lower().strip()
+        if resolved in {"llm", "ollama"}:
+            resolved = "ollama"
+        if resolved == "stub":
             return self._stub(question)
-        if mode == "ollama":
+        if resolved == "ollama":
             return await self._ollama(question, context)
         # auto: try Ollama, fall back to stub
         try:
@@ -49,7 +53,7 @@ class LLMClient:
             answer=(
                 "[STUB] Pipeline OK. Received your question: "
                 f"“{question.strip()}”. "
-                "Connect Ollama (LLM_MODE=ollama or auto with ollama serve) "
+                "Switch the UI to LLM mode (and run Ollama) "
                 "to generate a real answer from the local knowledge snippets."
             ),
             backend="stub",
@@ -72,7 +76,6 @@ class LLMClient:
             "options": {"temperature": 0.2},
         }
         async with httpx.AsyncClient(timeout=self.settings.request_timeout_seconds) as client:
-            # Fail fast if the daemon is down
             tags = await client.get(f"{host}/api/tags")
             tags.raise_for_status()
             response = await client.post(f"{host}/api/generate", json=payload)

@@ -36,7 +36,8 @@ Update this file whenever substantial new code or docs are added.
 | `src/gateway/interceptors.py` | Agent-generated | Cursor agent | **Critical review:** keyword lists for visa + crisis routes |
 | `src/gateway/knowledge.py` | Agent-generated | Cursor agent | Reviewed snippet accuracy / source URLs |
 | `src/gateway/llm_client.py` | Agent-generated | Cursor agent | Reviewed stub fallback + Ollama `/api/generate` usage |
-| `src/gateway/main.py` | Agent-generated | Cursor agent | Reviewed `/health` and `/ask` contracts |
+| `src/gateway/main.py` | Agent-generated | Cursor agent | Reviewed `/health`, `/ask`, `/mode`, UI static mount |
+| `src/gateway/static/index.html` | Agent-generated | Cursor agent | Reviewed Stub/LLM toggle + chat transcript UX |
 | `src/__init__.py` | Agent-generated | Cursor agent | N/A |
 | `tests/test_gateway.py` | Agent-generated | Cursor agent | Run `pytest`; extend if interceptors change |
 | `docs/architecture-diagram.md` | Agent-generated | Cursor agent | Check labels/one-liners against running system |
