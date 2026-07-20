@@ -50,6 +50,18 @@ We are **not** currently deploying API Gateway, Lambda, or a managed cloud LLM f
 - Personalized SIS / financial-aid eligibility  
 - CPT/OPT interpretation (hard-blocked by interceptors)
 
+## Assumptions and limitations
+
+This prototype intentionally prioritizes demonstrating the overall architecture over implementing a production-ready system. Several simplifying assumptions were made to keep the scope appropriate for an initial cloud prototype.
+
+- The knowledge base consists of a small, manually curated set of official CMU information rather than a continuously updated corpus.
+- Retrieval is implemented using simple keyword matching instead of semantic vector search.
+- Users remain anonymous, with no authentication, personalization, or persistent chat history.
+- Stub mode is the recommended deployment option within the AWS Academy Learner Lab due to storage and compute constraints, while Ollama support is provided as an optional enhancement.
+- The safety interceptors illustrate the policy enforcement pattern but are not intended to provide comprehensive moderation or institutional policy coverage.
+
+These design decisions allow the team to validate the end-to-end gateway architecture while minimizing operational complexity during the initial development phase.
+
 ## How to verify current state
 
 ```bash

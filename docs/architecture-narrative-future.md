@@ -55,6 +55,19 @@ Ollama in the current prototype is a **development stand-in**, not the productio
 - V2 requires stateful SIS personalization (may force on-prem / private model hosting)  
 - Open-source serving cost/performance becomes trivially cheap  
 
+## Future enhancements
+
+If the pilot proves successful, several enhancements could be incorporated in later phases:
+
+- Replace keyword retrieval with semantic search using vector embeddings.
+- Automatically ingest and index approved CMU webpages and policy documents.
+- Support authenticated users through CMU Single Sign-On for personalized services where appropriate.
+- Add monitoring, logging, and evaluation dashboards to measure response quality and system performance.
+- Collect user feedback to continuously improve retrieval quality and prompt engineering.
+- Expand human handoff workflows to integrate directly with existing university support systems.
+
+These enhancements were intentionally deferred in order to keep the initial pilot focused on validating the core gateway architecture before investing in additional infrastructure and operational complexity.
+
 ## Out of scope even in future V1 (per scoping doc)
 
 - Personalized advising (“Am I eligible…?”)  
