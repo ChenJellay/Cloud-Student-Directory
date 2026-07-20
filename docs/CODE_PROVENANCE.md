@@ -13,7 +13,7 @@ Update this file whenever substantial new code or docs are added.
 
 | Origin | Approximate share of this initial scaffold | Notes |
 |--------|--------------------------------------------|-------|
-| Agent-generated | ~95% of first commit scaffold | Application code, Devcontainer, docs drafts, tests |
+| Agent-generated | ~95% of first commit scaffold | Application code, Devcontainer, docs drafts, tests. Generated using Cursor Composer/Agent, then reviewed by the team before being committed. |
 | Human-validated | Scoping Document + ADR 001 (`.docx`) | Authored earlier; used as architectural source of truth |
 | Human-validated | All agent output below | Reviewed for scope fit, safety wording, and run instructions |
 | Human-written | Review logs & validations | Running tests, deploying the systems, testing the system on AWS, working with Git, etc. |
@@ -53,6 +53,21 @@ Update this file whenever substantial new code or docs are added.
 | `knowledge/README.md` | Agent-generated | Cursor agent | Reviewed |
 
 ---
+---
+
+## Human review methodology
+
+AI-generated code was treated as a first draft rather than accepted without review. Before committing any generated artifact, the team performed manual review to verify that the implementation matched the project requirements and architectural decisions documented in the Scoping Document and ADR 001.
+
+The review process focused on five areas:
+
+- **Functional correctness** – verified that endpoints, routing logic, and UI behaved as expected.
+- **Architectural consistency** – confirmed that generated code aligned with the intended gateway architecture and project scope.
+- **Safety and policy compliance** –  inspected the interceptor logic to ensure high-risk prompts were routed appropriately instead of reaching the language model.
+- **Deployment validation** – verified that the project could be built and executed successfully within the AWS Academy Learner Lab environment.
+- **Documentation accuracy** – reviewed all generated documentation, setup instructions, diagrams, and architecture descriptions for consistency with the implemented prototype.
+
+Any AI-generated content that could not be explained or verified by a team member was revised before being committed.
 
 ## Peer review / validation process (team)
 
@@ -73,6 +88,20 @@ Use this checklist for agent-generated code before considering it submission-rea
 | 2026-07-19 | Jerry Chen | Architectural Mechanics (whether the backend & UX work as intended) | Code runs on Cloud9 stub mode works perfectly & LLM mode requires large disk space to run with Ollama |
 | 2026-07-19 | Jerry Chen | Documentation Review | Looked through docs and all files produced by agent & made corrections manually, and provided additional instructions as needed |
 | | | | |
+
+---
+
+## AI usage workflow
+
+The team followed a consistent workflow when using generative AI during development:
+
+1. Generate an initial implementation using Cursor Composer/Agent.
+2. Review the generated code for correctness, readability, and consistency with the project architecture.
+3. Modify or simplify generated code when necessary.
+4. Execute and test the implementation in the development environment.
+5. Update project documentation and this provenance log to reflect significant AI-generated contributions.
+
+AI was primarily used to accelerate implementation and documentation. Final responsibility for architectural decisions, testing, deployment, and verification remained with the project team.
 
 ---
 
